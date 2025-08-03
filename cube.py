@@ -8,6 +8,7 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("3D Cube - Rotation Control")
 clock = pygame.time.Clock()
+font = pygame.font.SysFont(None, 24)
 
 # --- 3D 설정 ---
 projector = Projector(WIDTH, HEIGHT)
@@ -34,16 +35,16 @@ mouse_sensitivity = 2
 rotation_angles = [0, 0, 0]  # [x, y, z] 축에 대한 회전 각도 (라디안)
 rotation_speed = 0.02
 
-# 벡터와 함수 곱 함수
 def multiply_matrix_vector(matrix, vector):
+    """3x3 행렬과 3D 벡터를 곱합니다."""
     result = [0, 0, 0]
     for i in range(3):
         for j in range(3):
             result[i] += matrix[i][j] * vector[j]
     return tuple(result)
 
-# 회전 행렬
 def get_rotation_matrix(axis, angle):
+    """지정된 축과 각도에 대한 회전 행렬을 반환합니다."""
     c, s = math.cos(angle), math.sin(angle)
     if axis == 'x':
         return [[1, 0, 0], [0, c, -s], [0, s, c]]
@@ -72,12 +73,12 @@ while run:
     # 키보드 회전 입력
     keys = pygame.key.get_pressed()
     if keys[pygame.K_q]: rotation_angles[0] -= rotation_speed
-    if keys[pygame.K_w]: rotation_angles[0] += rotation_speed
-    if keys[pygame.K_a]: rotation_angles[1] -= rotation_speed
+    if keys[pygame.K_a]: rotation_angles[0] += rotation_speed
+    if keys[pygame.K_w]: rotation_angles[1] -= rotation_speed
     if keys[pygame.K_s]: rotation_angles[1] += rotation_speed
     if keys[pygame.K_e]: rotation_angles[2] -= rotation_speed
     if keys[pygame.K_d]: rotation_angles[2] += rotation_speed
-    if keys[pygame.K_SPACE]: rotation_angles = [0, 0, 0]
+    if keys[pygame.K_SPACE]: rotation_angles = [0,0,0]
 
     # 마우스 드래그 카메라 이동
     if mouse_clicked and mouse_last_pos:
@@ -119,6 +120,14 @@ while run:
         start_point = projected_points[edge[0]]
         end_point = projected_points[edge[1]]
         pygame.draw.line(screen, (255, 255, 255), start_point, end_point, 2)
+
+    # 카메라 좌표 표시
+    cam_text = f"Camera X: {camera_pos[0]:.2f} Y: {camera_pos[1]:.2f} Z: {camera_pos[2]:.2f}"
+    text_surface = font.render(cam_text, True, (255, 255, 255))
+    screen.blit(text_surface, (10, 10))
+
+    information = "Q,A : x-axis rotation\n W,S : y-axis rotation\n E,D : z-axis rotation"
+    screen.blit(font.render(information, True, (255, 255, 255)), (10, 30))
 
     pygame.display.update()
     clock.tick(60)
